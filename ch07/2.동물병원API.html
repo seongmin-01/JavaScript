@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.동물병원API</title>
+     <!--
+        날짜 : 2025/02/20
+        이름 : 김성민
+        내용 : 동물병원 API 실습 
+    -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3e75730c07eb2efc6812e1fef5b92571"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
+        mapOption = { 
+            center: new kakao.maps.LatLng(35.159600, 129.060206), // 지도의 중심좌표
+            level: 7 // 지도의 확대 레벨
+        };
+
+        var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+        
+        // 마커를 표시할 위치와 title 객체 배열입니다 
+        var positions = [
+            {
+                title: '해운대', 
+                latlng: new kakao.maps.LatLng(35.158765, 129.160577)
+            },
+            {
+                title: '광안리', 
+                latlng: new kakao.maps.LatLng(35.153248, 129.118546)
+            },
+            {
+                title: '송정', 
+                latlng: new kakao.maps.LatLng(35.178739, 129.199600)
+            },
+        ];
+
+        // 마커 이미지의 이미지 주소입니다
+        var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; 
+            
+        for (var i = 0; i < positions.length; i ++) {
+            
+            // 마커 이미지의 이미지 크기 입니다
+            var imageSize = new kakao.maps.Size(30, 45); 
+            
+            // 마커 이미지를 생성합니다    
+            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize); 
+            
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+                map: map, // 마커를 표시할 지도
+                position: positions[i].latlng, // 마커를 표시할 위치
+                title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                image : markerImage // 마커 이미지 
+            });
+        }
+
+        // 부산 동물병원 데이터 요청하기
+        const API_URL = 'https://apis.data.go.kr/6260000/BusanAnimalHospService/getTblAnimalHospital?serviceKey=bmH1bCxUDeTBQNMaI%2B%2BWD%2F4arj9AvqOQznddHfxfS0IYeb%2BfzxeeqSA6%2F4soigfua4drzn2Sos%2FOkpVmzqIzEg%3D%3D&pageNo=1&numOfRows=300&resultType=json';
+
+        fetch(API_URL)
+        .then(Response => Response.json())
+        .then(data => {
+            console.log(data.response.body.items.item);
+
+            for(const item of data.response.body.items.item) {
+
+                 // 마커가 표시될 위치입니다 
+            var markerPosition  = new kakao.maps.LatLng(item.lat, item.lon ); 
+
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+                position: markerPosition,
+                title: item.animal_hospital
+            });
+
+            // 마커가 지도 위에 표시되도록 설정합니다
+            marker.setMap(map);
+
+            }   
+        })
+        .catch(err => {
+            console.log(err);
+        });
+
+        });
+    </script>
+</head>
+<body>
+    <h3>부산 동물병원 현황</h3>
+    <div id="map" style="width:500px;height:400px;"></div>
+</body>
+</html>
